@@ -1,0 +1,154 @@
+---
+version: "2.1"
+services:
+  jellyfin:
+    image: jellyfin/jellyfin # ghcr.io/linuxserver/jellyfin
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /home/omar/jellyfin/config:/config
+      - /home/omar/jellyfin/data/tvshows:/data/tvshows
+      - /home/omar/jellyfin/data/movies:/data/movies
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.entrypoints=web"
+      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.project-multimedia.lab`)"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
+      - "traefik.http.routers.jellyfin-http.middlewares=https-redirect@docker"
+      - "traefik.http.routers.jellyfin-https.entrypoints=websecure"
+      - "traefik.http.routers.jellyfin-https.rule=Host(`jellyfin.project-multimedia.lab`)"
+      - "traefik.http.routers.jellyfin-https.tls=true"
+      - "traefik.http.routers.jellyfin-https.tls.certresolver=letsencrypt"
+
+    networks:
+      - traefik
+
+        # ports:
+        #   - 8096:8096
+    restart: unless-stopped
+
+  jackett:
+    image: ghcr.io/linuxserver/jackett
+    container_name: jackett
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /jackett/config:/config
+      - /jackett/downloads:/downloads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jackett.entrypoints=web"
+      - "traefik.http.routers.jackett.rule=Host(`jackett.project-multimedia.lab`)"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.https-redirect.redirectscheme.permanent=true"
+      - "traefik.http.routers.jackett-http.middlewares=https-redirect@docker"
+      - "traefik.http.routers.jackett-https.entrypoints=websecure"
+      - "traefik.http.routers.jackett-https.rule=Host(`jackett.project-multimedia.lab`)"
+      - "traefik.http.routers.jackett-https.tls=true"
+      - "traefik.http.routers.jackett-https.tls.certresolver=letsencrypt"
+
+    networks:
+      - traefik
+
+        # ports:
+        # - 9117:9117
+    restart: unless-stopped
+
+  radarr:
+    image: ghcr.io/linuxserver/radarr
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /radarr/config:/config
+      - /radarr/movies:/movies
+      - /radarr/downloads:/downloads
+    labels:
+      - "traefik.routers=radarr"
+      - "traefik.docker.network=traefik"
+      - "traefik.routers.rule=Host:radarr.project-multimedia.lab"
+    networks:
+      - traefik
+
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+
+  sonarr:
+    image: ghcr.io/linuxserver/sonarr
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /sonarr/config:/config
+      - /sonarr/tv:/tv
+      - /sonarr/downloads:/downloads
+    labels:
+      - "traefik.routers=sonarr"
+      - "traefik.docker.network=traefik"
+      - "traefik.routers.rule=Host:sonarr.project-multimedia.lab"
+    networks:
+      - traefik
+
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+
+  transmission:
+    image: ghcr.io/linuxserver/transmission
+    container_name: transmission
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    volumes:
+      - /transmission/config:/config
+      - /transmission/downloads:/downloads
+      - /transmission/watch:/watch
+    labels:
+      - "traefik.backend=transmission"
+      - "traefik.docker.network=traefik"
+      - "traefik.frontend.rule=Host:transmission.project-multimedia.lab"
+    networks:
+      - traefik
+
+    ports:
+      - 9091:9091
+      - 51413:51413
+    restart: unless-stopped
+
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr
+    container_name: flaresolverr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Paris
+    ports:
+      - 8191:8191
+    restart: unless-stopped
+
+  portainer:
+    image: portainer/portainer
+    container_name: portainer
+    ports:
+      - 9000:9000
+    volumes:
+      - /portainer/data:/data
+      - /var/run/docker.sock:/var/run/docker.sock
+
+networks:
+  traefik:
+    external: true
+            # name: traefik_webgateway
+        
