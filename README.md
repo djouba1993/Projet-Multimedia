@@ -13,7 +13,7 @@ il passe par transmission pour télécharger les séries qui seront stockées pa
 
 **Radarr** a un fonctionnement similaire à Sonarr mais  pour les films.
 
-Cependant Sonarr et Radarr ne proposent que très peu d’indexers (ou trackers) aujourd’hui. Jackett permet de combler ce manque et prend en charge plus d’une centaine de trackers.
+Cependant **Sonarr** et **Radarr** ne proposent que très peu d’indexers (ou trackers) aujourd’hui. Jackett permet de combler ce manque et prend en charge plus d’une centaine de trackers.
 Jackett fonctionne comme un serveur proxy, lorsque vous effectuez une recherche via Sonarr ou Radarr, celui-ci transforme et transmet la requête au tracker, analyse la réponse puis renvoie les résultats à l’application émettrice.
 
 ![Screenshot_209](https://user-images.githubusercontent.com/48188335/115953643-07ccd180-a4ed-11eb-834b-efd821205878.png)
