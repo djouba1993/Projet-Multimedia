@@ -31,6 +31,54 @@ omar@ubuntu-server:~/projet-multimedia$ sudo crontab  -e
 ```
 59 23 * * * (cd /home/omar/projet-multimedia && /usr/local/bin/docker-compose pull && /usr/local/bin/docker-compose up -d --remove-orphans && /usr/bin/docker image prune -f) > /var/log/docker-updater.log 2>&1
 ```
+### Mise jour automatique les images de tous les fichiers docker-compose.yml et relancer tous les stacks
+Comme vous pouvez le constater, mettre à jour une image nécessite de se rendre dans le répertoire de chaque docker-compose.yml et d’exécuter la commande de mise à jour et d’exécution de docker-compose. Nous allons automatiser cette tâche grâce à un script bash avec son fichier de configuration associé contenant l’ensemble des emplacements de nos fichiers docker-compose.yml. Nous allons créer une règle crontab où le script de mise à jour sera planifié pour exécution tous les jours à 23h59. Les traces liées à l’exécution du script seront enregistrées dans un fichier /var/log/docker-updater.log
+
+**1. Créez le fichier /opt/docker-updater/docker-updater contenant les lignes suivantes:**
+```
+#!/bin/bash
+
+# List of docker-compose configs
+DCOMPOSE=containers-to-update.conf
+
+# Update all docker compose scripts 
+DIR_SCRIPT=`dirname $0`
+if [ -e "$DIR_SCRIPT/$DCOMPOSE" ]
+then
+    cat "$DIR_SCRIPT/$DCOMPOSE" | /bin/grep -v '^#' | 
+    while read conf
+    do
+  if [ -e "$conf" ]
+  then
+      dir=$(dirname "$conf")
+      compfile=$(basename "$conf")    
+      cd "$dir"
+      /usr/local/bin/docker-compose pull && /usr/local/bin/docker-compose -f "$compfile" up -d --remove-orphans && /usr/bin/docker image prune -f 2>&1
+  else
+      echo "docker compose file $conf does not exist..."
+  fi
+    done
+fi
+```
+**2. Ajoutez les droits d’exécution sur le script /opt/docker-updater/docker-updater:**
+```
+omar@ubuntu-server:/opt/docker-updater$ sudo chmod ugo+x /opt/docker-updater/docker-updater
+```
+**3. Créez le fichier de configuration containers-to-update.conf dans le répertoire /opt/docker-updater et ajoutez le path absolu de chaque fichier docker-compose.yml:**
+```
+omar@ubuntu-server:/opt/docker-updater$ cat containers-to-update.conf 
+/home/omar/projet-multimedia/docker-compose.yml
+/home/omar/projet-multimedia/traefik/docker-compose.yml
+omar@ubuntu-server:/opt/docker-updater$
+```
+**4. Éditez la crontab:**
+```
+omar@ubuntu-server:~/projet-multimedia$ sudo crontab  -e
+```
+**5. Ajouter la ligne suivante et sauvargarder**
+```
+59 23 * * * /opt/docker-updater/docker-updater > /var/log/docker-updater.log 2>&1
+```
 
 ### Traefik
 
