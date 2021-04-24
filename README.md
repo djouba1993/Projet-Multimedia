@@ -32,6 +32,20 @@ omar@ubuntu-server:~/projet-multimedia$ sudo crontab  -e
 59 23 * * * (cd /home/omar/projet-multimedia && /usr/local/bin/docker-compose pull && /usr/local/bin/docker-compose up -d --remove-orphans && /usr/bin/docker image prune -f) > /var/log/docker-updater.log 2>&1
 ```
 
+### Traefik
+
+**Traefik** est un reverse-proxy moderne conçu pour faciliter le déploiement des microservices (Docker, Kubernetes, AWS, etc.). Traefik est extrêmement simple à configurer et gère automatiquement vos certificats délivrés par Let’s Encrypt. De plus, il est capable de charger vos containers dynamiquement sans interruption de service et dispose d’un dashboard affichant l’ensemble de vos routes configurées.
+ici on vous montre le dashbord de notre **traefik** avec tous les services qu'il faut.
+
+![Screenshot_210](https://user-images.githubusercontent.com/48188335/115954291-66477f00-a4f0-11eb-8cc1-7b0d0ec799a2.png)
+
+![Screenshot_211](https://user-images.githubusercontent.com/48188335/115954353-cd653380-a4f0-11eb-9d3b-ad84ab7ab8df.png)
+
+![Screenshot_212](https://user-images.githubusercontent.com/48188335/115954401-1ddc9100-a4f1-11eb-82b2-8efa67ec143d.png)
+
+
+
+
 
 
 
