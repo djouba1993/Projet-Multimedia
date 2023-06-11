@@ -37,7 +37,7 @@ Comme vous pouvez le constater, mettre à jour une image nécessite de se rendre
 **1. Créez le fichier /opt/docker-updater/docker-updater contenant les lignes suivantes:**
 ```
 #!/bin/bash
-
+# exec &> Sortie.log
 # List of docker-compose configs
 DCOMPOSE=containers-to-update.conf
 
